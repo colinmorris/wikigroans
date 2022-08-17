@@ -1,0 +1,5 @@
+- `groans.csv`: pairs of wikigroan titles separated by commas. Lines beginning with '#' are ignored.
+- `fetch_revisions.py`: script to grab revision history for each article listed in `groans.csv` and save them as json in the `revisions/` subdirectory, one file per title.
+- `groan.py`: interface for processing the revision histories saved by above script, in particular for the purposes of obtaining a time series of "average" sizes
+- `groans.ipynb`: notebook with visualizations of size data
+- `utils.py`: utility code shared by all the above modules
