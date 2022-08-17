@@ -1,17 +1,14 @@
 import requests
 import time
 import json
-import sys
 import os
+
+import utils
+from utils import debug
 
 SLEEPTIME = 1
 API_PREFIX = 'https://en.wikipedia.org/w/api.php'
 
-def debug(msg):
-    sys.stderr.write(msg + '\n')
-
-def munge_title(title):
-    return title.replace(' ', '_')
 
 def query_mw(**kwargs):
     params = kwargs.copy()
@@ -30,7 +27,7 @@ def get_revisions(title):
             action='query',
             prop='revisions',
             rvprop='|'.join(rvprops),
-            titles=munge_title(title),
+            titles=utils.munge_title(title),
             rvlimit=500,
     )
     res = None
@@ -46,10 +43,8 @@ def get_revisions(title):
 
     return revs
 
-REVISIONS_DIR = 'revisions'
 def fetch_revisions_for_title(title, force=False):
-    fname = munge_title(title) + '.json'
-    dest = os.path.join(REVISIONS_DIR, fname)
+    dest = utils.path_for_title(title)
     if not force and os.path.exists(dest):
         debug(f'SKIPPING fetch for extant title: {title}')
         return
@@ -59,13 +54,9 @@ def fetch_revisions_for_title(title, force=False):
         json.dump(revs, f, indent=2)
 
 def fetch_from_csv():
-    with open('groans.csv') as f:
-        for line in f:
-            if line.startswith('#'):
-                continue
-            titles = line.strip().split(',')
-            for title in titles:
-                fetch_revisions_for_title(title)
+    for titles in utils.load_groan_tuples():
+        for title in titles:
+            fetch_revisions_for_title(title)
 
 if __name__ == '__main__':
     fetch_from_csv()
