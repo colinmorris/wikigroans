@@ -3,6 +3,7 @@ import dateutil.tz
 import json
 import datetime
 import bisect
+import time
 
 import utils
 
@@ -68,6 +69,8 @@ class History:
 
     def size_per_month(self):
         """
+        Return a dict mapping datetime (representing the first of each month) to avg size for that month.
+
         For each month in history range...
             Locate range of revisions that include this month
             sum up size * time fraction for each revision
@@ -105,9 +108,12 @@ def dump_sizes(title, sizes):
             f.write(line)
 
 if __name__ == '__main__':
+    t0 = time.time()
     groans = utils.load_groan_tuples()
     for groan in groans:
         for title in groan:
             h = History.load_title(title)
             sizes = h.size_per_month()
             dump_sizes(title, sizes)
+    t1 = time.time()
+    print(f"Finished in {t1-t0:.1f} seconds")
